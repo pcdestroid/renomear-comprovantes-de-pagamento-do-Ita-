@@ -1,7 +1,6 @@
 import json
 import os
 import PyPDF2
-import keyboard
 import time
 
 #renomear comprovantes do banco itaú em uma determinada pasta
@@ -126,5 +125,4 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
                 os.rename(old_file, new_file)
         print('...')
         time.sleep(1)
-    print('Press ESC para sair...')
-    keyboard.wait("esc")
+    time.sleep(10)
