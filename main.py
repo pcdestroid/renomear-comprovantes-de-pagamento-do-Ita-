@@ -2,6 +2,7 @@ import json
 import os
 import PyPDF2
 import keyboard
+import time
 
 #renomear comprovantes do banco itaú em uma determinada pasta
 
@@ -13,12 +14,14 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
     for arquivo in arquivos:
         textoPDF = PyPDF2.PdfFileReader(os.path.join(diretorio, arquivo)).getPage(0).extractText()
         print('Renomenando arquivo: ' + arquivo)
-
+        
         #Banco Itaú - Comprovante de Pagamento TED C – outra titularidade
         if textoPDF.find("SISPAG FORNECEDORES TED") > 0:
+            print('Tipo de comprovante: SISPAG FORNECEDORES TED')
             #Pegar nome
             if textoPDF.find("Nome do favorecido:") > 0:
                 nome = textoPDF[textoPDF.find("Nome do favorecido:")+19:len(textoPDF)][0:textoPDF[textoPDF.find("Nome do favorecido:")+19:len(textoPDF)].find(" ")]
+                print("Fornecedor: " + nome)
             #Pegar CNPJ
             if textoPDF.find("CPF/CNPJ:") > 0:
                 cnpj = textoPDF[textoPDF.find("CPF/CNPJ:")+9:len(textoPDF)][0:textoPDF[textoPDF.find("CPF/CNPJ:")+9:len(textoPDF)].find("Número")]
@@ -34,9 +37,11 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
 
         #Comprovante de pagamento de boleto
         if textoPDF.find("pagamento de boleto") > 0:
+            print('Tipo de comprovante: Pagamento de boleto')
             #Pegar nome    
             if textoPDF.find("Beneficiário: ") > 0:
                 nome = textoPDF[textoPDF.find("Beneficiário: ")+14:len(textoPDF)][0:textoPDF[textoPDF.find("Beneficiário: ")+14:len(textoPDF)].find(" ")].replace(" ","")
+                print("Fornecedor: " + nome)
             #Pegar CNPJ
             if textoPDF.find("CPF/CNPJ:") > 0:
                 cnpj = textoPDF[len(textoPDF[0:textoPDF.find("Valor do boleto") - 11]) - 19:textoPDF.find("Valor do boleto") - 11].replace("/","").replace("-","").replace(".","").replace(" ","")
@@ -52,10 +57,12 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
 
         #Banco Itaú - Comprovante de Transferência
         if textoPDF.find("SISPAG TRANSF TITUL TED") > 0:
+            print('Tipo de comprovante: SISPAG TRANSF TITUL TED')
             #Pegar nome
             nome = textoPDF[textoPDF.find("Transferência via TED C")+23:textoPDF.find("Transferência efetuada")]
             nome = nome[nome.find("-")+1:len(nome)]
             nome = nome[1:nome.find(" ")]
+            print("Fornecedor: " + nome)
                
             #Pegar CNPJ
             cnpj = textoPDF[textoPDF.find("Transferência via TED C")+23:textoPDF.find("Transferência efetuada")]
@@ -84,10 +91,12 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
 
         #Banco Itaú - Comprovante de Transferência (BOLETO)
         if textoPDF.find("SISPAG FORNECEDORES") > 0:
+            print('Tipo de comprovante: SISPAG FORNECEDORES')
             #Pegar nome
             nome= textoPDF[textoPDF.find("Autenticação:")+13:len(textoPDF)]
             nome= nome[nome.find("-")+2:len(nome)]
             nome= nome[0:nome.find(" ")]
+            print("Fornecedor: " + nome)
             #Pegar CNPJ
             cnpj = '00000000000000' #Não tem CNPJ
             if textoPDF.find("CPF/CNPJ:") > 0:
@@ -115,6 +124,7 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 print('Renomeado para: ' + arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 os.rename(old_file, new_file)
-        
+        print('...')
+        time.sleep(1)
     print('Press ESC para sair...')
     keyboard.wait("esc")
