@@ -1,6 +1,7 @@
 import json
 import os
 import PyPDF2
+import keyboard
 
 #renomear comprovantes do banco itaú em uma determinada pasta
 
@@ -11,7 +12,8 @@ nome = ''; cnpj = ''; valor = ''
 for diretorio, subpastas, arquivos in os.walk(pasta):
     for arquivo in arquivos:
         textoPDF = PyPDF2.PdfFileReader(os.path.join(diretorio, arquivo)).getPage(0).extractText()
-        
+        print('Renomenando arquivo: ' + arquivo)
+
         #Banco Itaú - Comprovante de Pagamento TED C – outra titularidade
         if textoPDF.find("SISPAG FORNECEDORES TED") > 0:
             #Pegar nome
@@ -27,6 +29,7 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             if os.path.exists(pasta+'/'+arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf") == False:
                 old_file = os.path.join(pasta, arquivo)
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
+                print('Renomeado para: ' + arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 os.rename(old_file, new_file) 
 
         #Comprovante de pagamento de boleto
@@ -44,6 +47,7 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             if os.path.exists(pasta+'/'+arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf") == False:
                 old_file = os.path.join(pasta, arquivo)
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
+                print('Renomeado para: ' + arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 os.rename(old_file, new_file)
 
         #Banco Itaú - Comprovante de Transferência
@@ -51,16 +55,20 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             #Pegar nome
             nome = textoPDF[textoPDF.find("Transferência via TED C")+23:textoPDF.find("Transferência efetuada")]
             nome = nome[nome.find("-")+1:len(nome)]
-            nome = nome[1:nome.find(" ")]     
+            nome = nome[1:nome.find(" ")]
+               
             #Pegar CNPJ
-
             cnpj = textoPDF[textoPDF.find("Transferência via TED C")+23:textoPDF.find("Transferência efetuada")]
             cnpj = cnpj[cnpj.find("-")+1:len(cnpj)]
+            
             if cnpj.find("/") > 0:
                 cnpj = cnpj[cnpj.find("/")-10:len(cnpj)]
                 cnpj = cnpj[0:cnpj.find("-")+3]
                 cnpj = cnpj[len(cnpj)-18:len(cnpj)].replace(" ","").replace("/","").replace(".","").replace("-","")
-            
+            if len(cnpj) > 14:
+                cnpj = cnpj[cnpj.find("-")-11:len(cnpj)]
+                cnpj = cnpj[0:cnpj.find("-")+3].replace(".","").replace("-","")
+
             #Pegar valor
             valor = textoPDF[textoPDF.find("Transferência via TED C")+23:textoPDF.find("Transferência efetuada")]
             valor = valor[valor.find("-")+1:len(valor)]
@@ -71,6 +79,7 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             if os.path.exists(pasta+'/'+arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf") == False:
                 old_file = os.path.join(pasta, arquivo)
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
+                print('Renomeado para: ' + arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 os.rename(old_file, new_file)
 
         #Banco Itaú - Comprovante de Transferência (BOLETO)
@@ -80,18 +89,32 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             nome= nome[nome.find("-")+2:len(nome)]
             nome= nome[0:nome.find(" ")]
             #Pegar CNPJ
-            cnpj = '00000000000000'
-            #Não tem CNPJ
-        
+            cnpj = '00000000000000' #Não tem CNPJ
+            if textoPDF.find("CPF/CNPJ:") > 0:
+                cnpj = textoPDF[textoPDF.find("Autenticação:"):textoPDF.find("Transferência efetuada em")]
+                cnpj = cnpj[cnpj.find("/")+1:len(cnpj)]
+                if cnpj.find("/")>0:
+                    cnpj = cnpj[cnpj.find("/")-10:len(cnpj)]
+                    cnpj = cnpj[0:cnpj.find("-")+3].replace(" ","").replace("/","").replace(".","").replace("-","")
+
             #Pegar valor
             valor= textoPDF[textoPDF.find("Autenticação:")+13:len(textoPDF)]
             valor= valor[valor.find("-")+2:len(valor)]
             valor = valor[0:valor.find("Transferência efetuada em")]
             valor = valor[valor.find("-")+2:len(valor)]
+            if valor.find("-") >0:
+                valor = valor[valor.find("-")+1:len(valor)] 
             if valor.find("/") >0:
                 valor = valor[valor.find("/")+8:len(valor)]
+            if valor.find("-") >0:
+                valor = valor[valor.find("-")+2:len(valor)]
+                print(valor)
             #Renomear o arquivo
             if os.path.exists(pasta+'/'+arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf") == False:
                 old_file = os.path.join(pasta, arquivo)
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
+                print('Renomeado para: ' + arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+".pdf")
                 os.rename(old_file, new_file)
+        
+    print('Press ESC para sair...')
+    keyboard.wait("esc")
