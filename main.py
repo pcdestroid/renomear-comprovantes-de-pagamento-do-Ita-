@@ -77,20 +77,15 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             nome= nome[0:nome.find(" ")]
             print(nome)
             #Pegar CNPJ
-            cnpj = '00000000000000'
+            cnpj = '000000000000'
             #Não tem CNPJ
         
             #Pegar valor
-            
             valor= textoPDF[textoPDF.find("Autenticação:")+13:len(textoPDF)]
             valor= valor[valor.find("-")+2:len(valor)]
             valor = valor[valor.find("/")+8:len(valor)]
             valor = valor[0:valor.find("Transferência efetuada em")]
-            
-            print(valor)
-            #valor = textoPDF[textoPDF.find("Transferência efetuada em")
-
-             
+            #Renomear o arquivo
             if os.path.exists(pasta+'/'+nome+'-'+cnpj+'-'+valor+".pdf") == False:
                 old_file = os.path.join(pasta, arquivo)
                 new_file = os.path.join(pasta, arquivo[0:arquivo.find("-")+1]+cnpj+'-'+valor+'-'+nome+".pdf")
@@ -101,10 +96,3 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
         print(nome)
         print(cnpj)
         print(valor)
-
-
-           
-
-
-
-
