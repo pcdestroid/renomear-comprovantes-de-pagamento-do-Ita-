@@ -23,12 +23,7 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             #Pegar valor
             if textoPDF.find("Valor da TED:") > 0:
                 valor = textoPDF[textoPDF.find("Valor da TED:")+13:len(textoPDF)][0:textoPDF[textoPDF.find("Valor da TED:")+13:len(textoPDF)].find("Finalidade:")].replace("R$ ","")
-        
-            if os.path.exists(pasta+'/'+nome+'-'+cnpj+'-'+valor+".pdf") == False:
-                old_file = os.path.join(pasta, arquivo)
-                new_file = os.path.join(pasta, nome+'-'+cnpj+'-'+valor+".pdf")
-                os.rename(old_file, new_file)
-
+            
         #Comprovante de pagamento de boleto
         if textoPDF.find("pagamento de boleto") > 0:
             #Pegar nome    
@@ -41,11 +36,11 @@ for diretorio, subpastas, arquivos in os.walk(pasta):
             if textoPDF.find("Valor do boleto (R$); ") > 0:
                 valor = textoPDF[textoPDF.find("Valor do boleto (R$); ")+22:len(textoPDF)][0:textoPDF[textoPDF.find("Valor do boleto (R$); ")+22:len(textoPDF)].find(" ")].replace(" ","")
             
-            if os.path.exists(pasta+'/'+nome+'-'+cnpj+'-'+valor+".pdf") == False:
-                old_file = os.path.join(pasta, arquivo)
-                new_file = os.path.join(pasta, nome+'-'+cnpj+'-'+valor+".pdf")
-                os.rename(old_file, new_file)
-            
+        if os.path.exists(pasta+'/'+nome+'-'+cnpj+'-'+valor+".pdf") == False:
+            old_file = os.path.join(pasta, arquivo)
+            new_file = os.path.join(pasta, nome+'-'+cnpj+'-'+valor+".pdf")
+            os.rename(old_file, new_file)
+
         print("Comprovante de pagamento: ")
         print(nome)
         print(cnpj)
